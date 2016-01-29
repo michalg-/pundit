@@ -34,6 +34,16 @@ module Pundit
     def policy!(user, record, namespace = Object)
       PolicyFinder.new(record, namespace).policy!.new(user, record)
     end
+
+    def authorize(user, record, query)
+      policy = policy!(user, record)
+
+      unless policy.public_send(query)
+        raise NotAuthorizedError, query: query, record: record, policy: policy
+      end
+
+      true
+    end
   end
 
   included do
